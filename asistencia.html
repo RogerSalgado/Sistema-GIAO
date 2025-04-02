@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asistencia - GIAO</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">Sistema GIAO</div>
+    <div class="user-info">
+      <button onclick="volver()">Volver</button>
+    </div>
+  </header>
+
+  <main class="contenido">
+    <h1>Registro de Asistencia</h1>
+    
+    <div class="acciones">
+        <button id="btn-entrada" onclick="marcar('entrada')">🕑 Marcar Entrada</button>
+        <button id="btn-salida" onclick="marcar('salida')">🏁 Marcar Salida</button>
+      </div>     
+
+    <h3>Historial de marcajes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Tipo</th>
+        </tr>
+      </thead>
+      <tbody id="historial">
+        <!-- Aquí se agregarán los registros -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    const btnEntrada = document.getElementById("btn-entrada");
+    const btnSalida = document.getElementById("btn-salida");
+    const historial = document.getElementById("historial");
+  
+    // Cargar historial y dejar botones activos
+    window.onload = function () {
+      const registros = JSON.parse(localStorage.getItem("asistencia")) || [];
+      historial.innerHTML = "";
+  
+      registros.forEach(r => {
+        agregarFila(r.fecha, r.hora, r.tipo);
+      });
+  
+      // Al iniciar, ambos botones activos para pruebas
+      btnEntrada.disabled = false;
+      btnSalida.disabled = false;
+    };
+  
+    function marcar(tipo) {
+      const ahora = new Date();
+      const fechaEntrada = tipo === "entrada"
+        ? ahora.toLocaleDateString()
+        : obtenerFechaUltimaEntrada() || ahora.toLocaleDateString();
+  
+      const nuevo = {
+        fecha: fechaEntrada,
+        hora: ahora.toLocaleTimeString(),
+        tipo: tipo === "entrada" ? "Entrada" : "Salida"
+      };
+  
+      const registros = JSON.parse(localStorage.getItem("asistencia")) || [];
+      registros.push(nuevo);
+      localStorage.setItem("asistencia", JSON.stringify(registros));
+  
+      agregarFila(nuevo.fecha, nuevo.hora, nuevo.tipo);
+  
+      // Comportamiento dinámico de los botones
+      if (tipo === "entrada") {
+        btnEntrada.disabled = true;
+        btnSalida.disabled = false;
+      }
+  
+      if (tipo === "salida") {
+        btnEntrada.disabled = false;
+        btnSalida.disabled = false;
+      }
+    }
+  
+    function agregarFila(fecha, hora, tipo) {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>${fecha}</td>
+        <td>${hora}</td>
+        <td>${tipo}</td>
+      `;
+      historial.appendChild(fila);
+    }
+  
+    function obtenerFechaUltimaEntrada() {
+      const registros = JSON.parse(localStorage.getItem("asistencia")) || [];
+      let fechaEntradaPendiente = null;
+  
+      for (let i = registros.length - 1; i >= 0; i--) {
+        if (registros[i].tipo === "Salida") break;
+        if (registros[i].tipo === "Entrada") {
+          fechaEntradaPendiente = registros[i].fecha;
+          break;
+        }
+      }
+      return fechaEntradaPendiente;
+    }
+  
+    function volver() {
+      window.location.href = "dashboard.html";
+    }
+  </script>
+  
+  
+  
+  
+</body>
+</html>
