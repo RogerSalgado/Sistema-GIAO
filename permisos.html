@@ -8,15 +8,14 @@
 </head>
 <body class="bg-light">
   <div class="container mt-5">
-    <h2 class="text-center text-danger mb-4">Solicitud de Permisos / Vacaciones / Incapacidades</h2>
+    <h2 class="text-center text-danger mb-4">Solicitud de Permisos / Incapacidades</h2>
 
     <form id="formPermiso" class="bg-white p-4 rounded shadow">
       <div class="mb-3">
         <label for="tipo" class="form-label">Tipo de Solicitud</label>
-        <select class="form-select" id="tipo" required>
+        <select class="form-select" id="tipo" required onchange="mostrarCampos()">
           <option value="">Seleccione una opción</option>
           <option value="Permiso">Permiso</option>
-          <option value="Vacaciones">Vacaciones</option>
           <option value="Incapacidad">Incapacidad</option>
         </select>
       </div>
@@ -32,15 +31,25 @@
         </div>
       </div>
 
+      <div class="mb-3" id="horasDiv" style="display: none;">
+        <label for="horas" class="form-label">Cantidad de Horas (1 a 8)</label>
+        <input type="number" class="form-control" id="horas" min="1" max="8">
+      </div>
+
+      <div class="mb-3" id="adjuntoDiv" style="display: none;">
+        <label for="adjunto" class="form-label">Adjuntar Documento de Incapacidad</label>
+        <input type="file" class="form-control" id="adjunto">
+      </div>
+
       <div class="mb-3">
         <label for="comentario" class="form-label">Comentario</label>
-        <textarea class="form-control" id="comentario" rows="3" placeholder="Escriba aquí su justificación..." required></textarea>
+        <textarea class="form-control" id="comentario" rows="3" required></textarea>
       </div>
 
       <button type="submit" class="btn btn-danger w-100">Enviar Solicitud</button>
     </form>
 
-    <h4 class="mt-5">📄 Solicitudes Realizadas (Simulado)</h4>
+    <h4 class="mt-5">📄 Solicitudes Realizadas</h4>
     <table class="table table-bordered mt-3">
       <thead class="table-danger">
         <tr>
@@ -48,11 +57,11 @@
           <th>Inicio</th>
           <th>Fin</th>
           <th>Comentario</th>
+          <th>Horas</th>
+          <th>Estado</th>
         </tr>
       </thead>
-      <tbody id="tablaPermisos">
-        <!-- Filas generadas dinámicamente -->
-      </tbody>
+      <tbody id="tablaPermisos"></tbody>
     </table>
 
     <div class="text-end">
@@ -61,6 +70,12 @@
   </div>
 
   <script>
+    function mostrarCampos() {
+      const tipo = document.getElementById("tipo").value;
+      document.getElementById("horasDiv").style.display = tipo === "Permiso" ? "block" : "none";
+      document.getElementById("adjuntoDiv").style.display = tipo === "Incapacidad" ? "block" : "none";
+    }
+
     document.getElementById("formPermiso").addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -68,9 +83,15 @@
       const inicio = document.getElementById("inicio").value;
       const fin = document.getElementById("fin").value;
       const comentario = document.getElementById("comentario").value;
+      const horas = document.getElementById("horas").value || "-";
 
       if (new Date(inicio) > new Date(fin)) {
         alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        return;
+      }
+
+      if (tipo === "Permiso" && horas !== "-" && parseInt(horas) > 4) {
+        alert("Los permisos mayores a 4 horas deben ser solicitados como vacaciones.");
         return;
       }
 
@@ -80,12 +101,13 @@
           <td>${inicio}</td>
           <td>${fin}</td>
           <td>${comentario}</td>
+          <td>${horas}</td>
+          <td><span class="badge bg-warning text-dark">Pendiente</span></td>
         </tr>
       `;
       document.getElementById("tablaPermisos").innerHTML += fila;
-
-      // Limpiar el formulario
       this.reset();
+      mostrarCampos(); // Oculta campos si se reinicia
     });
 
     function volver() {
