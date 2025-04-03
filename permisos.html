@@ -59,6 +59,7 @@
           <th>Comentario</th>
           <th>Horas</th>
           <th>Estado</th>
+          <th>Respuesta</th>
         </tr>
       </thead>
       <tbody id="tablaPermisos"></tbody>
@@ -74,6 +75,30 @@
       const tipo = document.getElementById("tipo").value;
       document.getElementById("horasDiv").style.display = tipo === "Permiso" ? "block" : "none";
       document.getElementById("adjuntoDiv").style.display = tipo === "Incapacidad" ? "block" : "none";
+    }
+
+    const nombre = localStorage.getItem("nombre") || "Usuario";
+    let solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
+
+    function mostrarSolicitudes() {
+      const tabla = document.getElementById("tablaPermisos");
+      tabla.innerHTML = "";
+
+      solicitudes
+        .filter(s => (s.tipo === "Permiso" || s.tipo === "Incapacidad") && s.empleado === nombre)
+        .forEach(s => {
+          const fila = document.createElement("tr");
+          fila.innerHTML = `
+            <td>${s.tipo}</td>
+            <td>${s.inicio}</td>
+            <td>${s.fin}</td>
+            <td>${s.comentario}</td>
+            <td>${s.horas || "-"}</td>
+            <td><span class="badge ${s.estado === "Pendiente" ? "bg-warning text-dark" : s.estado === "Aprobado" ? "bg-success" : "bg-danger"}">${s.estado}</span></td>
+            <td>${s.respuesta || ""}</td>
+          `;
+          tabla.appendChild(fila);
+        });
     }
 
     document.getElementById("formPermiso").addEventListener("submit", function(e) {
@@ -95,24 +120,30 @@
         return;
       }
 
-      const fila = `
-        <tr>
-          <td>${tipo}</td>
-          <td>${inicio}</td>
-          <td>${fin}</td>
-          <td>${comentario}</td>
-          <td>${horas}</td>
-          <td><span class="badge bg-warning text-dark">Pendiente</span></td>
-        </tr>
-      `;
-      document.getElementById("tablaPermisos").innerHTML += fila;
+      const nuevaSolicitud = {
+        id: Date.now(),
+        empleado: nombre,
+        tipo,
+        inicio,
+        fin,
+        comentario,
+        horas,
+        estado: "Pendiente",
+        respuesta: ""
+      };
+
+      solicitudes.push(nuevaSolicitud);
+      localStorage.setItem("solicitudesGIAO", JSON.stringify(solicitudes));
       this.reset();
-      mostrarCampos(); // Oculta campos si se reinicia
+      mostrarCampos();
+      mostrarSolicitudes();
     });
 
     function volver() {
       window.location.href = "dashboard.html";
     }
+
+    mostrarSolicitudes();
   </script>
 </body>
 </html>

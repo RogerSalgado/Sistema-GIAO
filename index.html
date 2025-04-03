@@ -9,7 +9,7 @@
 <body>
   <div class="login-container">
     <form id="loginForm">
-      <h2>Sistema GIAO</h2>
+      <h2>SISTEMA DE GESTION INTEGRAL DE ASISTENCIA OUTSORCING (GIAO)</h2>
       <label for="usuario">Usuario</label>
       <input type="text" id="usuario" placeholder="Ingrese su usuario" required>
 
@@ -33,15 +33,26 @@
 
       // Simulación de usuarios
       const credenciales = [
-        { usuario: "admin", clave: "admin123", rol: "admin" },
-        { usuario: "usuario", clave: "usuario123", rol: "usuario" }
+        { usuario: "admin", clave: "admin123", rol: "admin", nombre: "Martin Palermo" },
+        { usuario: "usuario", clave: "usuario123", rol: "usuario",nombre: "Juan Riquelme" },
+        { usuario: "jefe", clave: "jefe123", rol: "jefe", area:"desarrollo", nombre: "Francesco Totti"},
+        { usuario: "Roger", clave: "Rasi12", rol: "usuario", nombre: "Roger Alexis Salgado" }
       ];
 
       const encontrado = credenciales.find(u => u.usuario === usuario && u.clave === clave);
 
       if (encontrado) {
         localStorage.setItem("rol", encontrado.rol);
-        window.location.href = "dashboard.html";
+        localStorage.setItem("nombre", encontrado.nombre);
+
+        if (encontrado.rol === "admin") {
+          window.location.href = "dashboard_admin.html";
+        } else if (encontrado.rol === "jefe") {
+          window.location.href = "dashboard_jefe.html";
+        } else {
+          window.location.href = "dashboard.html";
+        }
+
       } else {
         alert("Usuario o contraseña incorrectos.");
       }

@@ -8,15 +8,13 @@
 </head>
 <body class="bg-light">
   <div class="container mt-5">
-    <h2 class="text-center text-danger mb-4">Solicitud de Vacaciones</h2>
+    <h2 class="text-center text-danger mb-4">🌴 Solicitud de Vacaciones</h2>
 
-    <!-- Vacaciones disponibles -->
-    <div class="alert alert-info text-center">
-      <strong>Vacaciones disponibles:</strong> <span id="diasDisponibles">10</span> días
+    <div class="text-end mb-3">
+      <strong>Días disponibles:</strong> <span class="badge bg-danger">10</span>
     </div>
 
-    <!-- Formulario -->
-    <form id="formVacaciones" class="bg-white p-4 rounded shadow mb-4">
+    <form id="formVacaciones" class="bg-white p-4 rounded shadow">
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="inicio" class="form-label">Fecha de Inicio</label>
@@ -29,23 +27,22 @@
       </div>
 
       <div class="mb-3">
-        <label for="comentario" class="form-label">Comentario (opcional)</label>
-        <textarea class="form-control" id="comentario" rows="2"></textarea>
+        <label for="comentario" class="form-label">Comentario</label>
+        <textarea class="form-control" id="comentario" rows="3" placeholder="Escriba el motivo o detalle..." required></textarea>
       </div>
 
       <button type="submit" class="btn btn-danger w-100">Enviar Solicitud</button>
     </form>
 
-    <!-- Historial -->
-    <h4>📄 Historial de Solicitudes</h4>
+    <h4 class="mt-5">📄 Solicitudes Realizadas</h4>
     <table class="table table-bordered mt-3">
       <thead class="table-danger">
         <tr>
           <th>Inicio</th>
           <th>Fin</th>
-          <th>Días Solicitados</th>
           <th>Comentario</th>
           <th>Estado</th>
+          <th>Respuesta del Jefe</th>
         </tr>
       </thead>
       <tbody id="tablaVacaciones"></tbody>
@@ -57,19 +54,25 @@
   </div>
 
   <script>
-    let vacacionesDisponibles = 10;
+    const nombre = localStorage.getItem("nombre") || "Empleado";
+    let solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
 
-    function calcularDiasHabiles(fechaInicio, fechaFin) {
-      const inicio = new Date(fechaInicio);
-      const fin = new Date(fechaFin);
-      let total = 0;
+    function mostrarSolicitudes() {
+      const tabla = document.getElementById("tablaVacaciones");
+      tabla.innerHTML = "";
 
-      for (let d = new Date(inicio); d <= fin; d.setDate(d.getDate() + 1)) {
-        const dia = d.getDay();
-        if (dia !== 0 && dia !== 6) total++; // Excluir sábados y domingos
-      }
-
-      return total;
+      solicitudes.filter(s => s.tipo === "Vacaciones" && s.empleado === nombre)
+        .forEach(s => {
+          const fila = document.createElement("tr");
+          fila.innerHTML = `
+            <td>${s.inicio}</td>
+            <td>${s.fin}</td>
+            <td>${s.comentario}</td>
+            <td>${s.estado}</td>
+            <td>${s.respuesta || ""}</td>
+          `;
+          tabla.appendChild(fila);
+        });
     }
 
     document.getElementById("formVacaciones").addEventListener("submit", function(e) {
@@ -79,43 +82,33 @@
       const fin = document.getElementById("fin").value;
       const comentario = document.getElementById("comentario").value;
 
-      if (!inicio || !fin) {
-        alert("Por favor, seleccione fechas válidas.");
+      if (new Date(inicio) > new Date(fin)) {
+        alert("La fecha de inicio no puede ser posterior a la de fin.");
         return;
       }
 
-      const diasSolicitados = calcularDiasHabiles(inicio, fin);
+      const nuevaSolicitud = {
+        id: Date.now(),
+        empleado: nombre,
+        tipo: "Vacaciones",
+        inicio,
+        fin,
+        comentario,
+        estado: "Pendiente",
+        respuesta: ""
+      };
 
-      if (diasSolicitados <= 0) {
-        alert("Debe seleccionar un rango de fechas válido.");
-        return;
-      }
-
-      if (diasSolicitados > vacacionesDisponibles) {
-        alert(`No puede solicitar más de ${vacacionesDisponibles} días.`);
-        return;
-      }
-
-      vacacionesDisponibles -= diasSolicitados;
-      document.getElementById("diasDisponibles").textContent = vacacionesDisponibles;
-
-      const fila = `
-        <tr>
-          <td>${inicio}</td>
-          <td>${fin}</td>
-          <td>${diasSolicitados}</td>
-          <td>${comentario || "-"}</td>
-          <td><span class="badge bg-warning text-dark">Pendiente</span></td>
-        </tr>
-      `;
-      document.getElementById("tablaVacaciones").innerHTML += fila;
-
+      solicitudes.push(nuevaSolicitud);
+      localStorage.setItem("solicitudesGIAO", JSON.stringify(solicitudes));
       this.reset();
+      mostrarSolicitudes();
     });
 
     function volver() {
       window.location.href = "dashboard.html";
     }
+
+    mostrarSolicitudes();
   </script>
 </body>
 </html>

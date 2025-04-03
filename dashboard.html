@@ -11,11 +11,7 @@
   <header class="navbar navbar-expand-lg navbar-dark bg-danger px-4">
     <a class="navbar-brand fw-bold text-white" href="#">Sistema GIAO</a>
     <div class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="menu-admin">
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#">⚙️ Gestión Admin</a>
-        </li>
-      </ul>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
       <span class="navbar-text me-3 text-white" id="nombre-usuario">Usuario</span>
       <button class="btn btn-light btn-sm" onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
@@ -43,7 +39,7 @@
           🌴<br>Vacaciones
         </a>
       </div>
-    </div>    
+    </div>
 
     <div class="text-center mt-5">
       <h5>Días de Vacaciones disponibles: <span class="badge bg-danger">10</span></h5>
@@ -52,13 +48,10 @@
 
   <script>
     const rol = localStorage.getItem("rol");
-    const nombre = rol.charAt(0).toUpperCase() + rol.slice(1);
+    const nombre = localStorage.getItem("nombre") || "Usuario";
+
     document.getElementById("nombre-usuario").textContent = nombre;
     document.getElementById("bienvenida").textContent = `Bienvenido al sistema GIAO, ${nombre}`;
-
-    if (rol !== "admin") {
-      document.getElementById("menu-admin").style.display = "none";
-    }
 
     function cerrarSesion() {
       localStorage.clear();
@@ -67,5 +60,3 @@
   </script>
 </body>
 </html>
-
-
