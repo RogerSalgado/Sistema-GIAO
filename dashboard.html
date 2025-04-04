@@ -47,9 +47,7 @@
   </main>
 
   <script>
-    const rol = localStorage.getItem("rol");
     const nombre = localStorage.getItem("nombre") || "Usuario";
-
     document.getElementById("nombre-usuario").textContent = nombre;
     document.getElementById("bienvenida").textContent = `Bienvenido al sistema GIAO, ${nombre}`;
 

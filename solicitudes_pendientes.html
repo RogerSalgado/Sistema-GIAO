@@ -18,6 +18,7 @@
           <th>Inicio</th>
           <th>Fin</th>
           <th>Comentario</th>
+          <th>Horas</th>
           <th>Estado</th>
           <th>Respuesta del Jefe</th>
           <th>Acciones</th>
@@ -34,29 +35,29 @@
   <script>
     let solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
 
-const tabla = document.getElementById("tablaSolicitudes");
+    const tabla = document.getElementById("tablaSolicitudes");
 
-solicitudes
-  .filter(s => s.estado === "Pendiente")
-  .forEach((s, index) => {
-    const fila = document.createElement("tr");
-    fila.setAttribute("id", `solicitud-${s.id}`);
-    fila.innerHTML = `
-      <td>${s.empleado}</td>
-      <td>${s.tipo}</td>
-      <td>${s.inicio}</td>
-      <td>${s.fin}</td>
-      <td>${s.comentario}</td>
-      <td id="estado-${s.id}">${s.estado}</td>
-      <td id="respuesta-${s.id}">${s.respuesta || ""}</td>
-      <td>
-        <button class="btn btn-success btn-sm me-1" onclick="aprobar(${s.id})">✔️</button>
-        <button class="btn btn-danger btn-sm" onclick="rechazar(${s.id})">❌</button>
-      </td>
-    `;
-    tabla.appendChild(fila);
-  });
-
+    solicitudes
+      .filter(s => s.estado === "Pendiente")
+      .forEach(s => {
+        const fila = document.createElement("tr");
+        fila.setAttribute("id", `solicitud-${s.id}`);
+        fila.innerHTML = `
+          <td>${s.empleado}</td>
+          <td>${s.tipo}</td>
+          <td>${s.inicio}</td>
+          <td>${s.fin}</td>
+          <td>${s.comentario}</td>
+          <td>${s.horas || "-"}</td>
+          <td id="estado-${s.id}">${s.estado}</td>
+          <td id="respuesta-${s.id}">${s.respuesta || ""}</td>
+          <td>
+            <button class="btn btn-success btn-sm me-1" onclick="aprobar(${s.id})">✔️</button>
+            <button class="btn btn-danger btn-sm" onclick="rechazar(${s.id})">❌</button>
+          </td>
+        `;
+        tabla.appendChild(fila);
+      });
 
     function aprobar(id) {
       const comentario = prompt("Ingrese un comentario al aprobar:");

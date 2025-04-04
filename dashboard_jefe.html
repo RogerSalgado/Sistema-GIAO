@@ -48,12 +48,10 @@
 
   <script>
     const nombre = localStorage.getItem("nombre") || "Jefe";
-    const rol = localStorage.getItem("rol");
-
     document.getElementById("nombre-usuario").textContent = nombre;
     document.getElementById("bienvenida").textContent = `Bienvenido al panel de ${nombre}`;
 
-    // Solo mostrar botón de Proyectos si es jefe de desarrollo (por nombre o simulado)
+    // Mostrar botón de Proyectos solo para jefes de desarrollo o personalizados
     if (nombre.toLowerCase().includes("desarrollo") || nombre.toLowerCase().includes("roger")) {
       document.getElementById("btn-proyectos").style.display = "block";
     }

@@ -4,57 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - GIAO</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #990000;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background-color: #c62828;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .btn {
+      font-weight: bold;
+    }
+
+    .alert {
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-  <div class="login-container">
-    <form id="loginForm">
-      <h2>SISTEMA DE GESTION INTEGRAL DE ASISTENCIA OUTSORCING (GIAO)</h2>
-      <label for="usuario">Usuario</label>
-      <input type="text" id="usuario" placeholder="Ingrese su usuario" required>
 
-      <label for="clave">Contraseña</label>
-      <input type="password" id="clave" placeholder="Ingrese su contraseña" required>
+  <div class="login-box">
+    <form id="loginForm" autocomplete="on">
+      <h2 class="text-center mb-4">GIAO - Iniciar Sesión</h2>
 
-      <button type="submit">Iniciar Sesión</button>
+      <div class="mb-3">
+        <label for="usuario" class="form-label">Usuario</label>
+        <input type="text" class="form-control" id="usuario" placeholder="Ingrese su usuario" autocomplete="username" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="clave" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="clave" placeholder="Ingrese su contraseña" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="btn btn-light w-100">Ingresar</button>
+
+      <div id="mensajeError" class="alert alert-danger d-none text-center" role="alert">
+        Usuario o contraseña incorrectos.
+      </div>
     </form>
   </div>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
+    const usuarios = [
+      { usuario: "admin", clave: "admin123", rol: "admin", nombre: "Martin Palermo", activo: true },
+      { usuario: "usuario", clave: "usuario123", rol: "usuario", nombre: "Juan Riquelme", activo: true },
+      { usuario: "jefe", clave: "jefe123", rol: "jefe", nombre: "Francesco Totti", area: "desarrollo", activo: true },
+      { usuario: "Roger", clave: "Rasi12", rol: "usuario", nombre: "Roger Alexis Salgado", activo: true },
+      { usuario: "inactivo", clave: "1234", rol: "usuario", nombre: "Usuario Deshabilitado", activo: false }
+    ];
+
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
       e.preventDefault();
+
       const usuario = document.getElementById("usuario").value.trim();
       const clave = document.getElementById("clave").value.trim();
+      const mensajeError = document.getElementById("mensajeError");
 
-      if (usuario === "" || clave === "") {
-        alert("Por favor ingrese su usuario y contraseña.");
+      const encontrado = usuarios.find(u => u.usuario === usuario && u.clave === clave);
+
+      if (!encontrado) {
+        mensajeError.textContent = "Usuario o contraseña incorrectos.";
+        mensajeError.classList.remove("d-none");
         return;
       }
 
-      // Simulación de usuarios
-      const credenciales = [
-        { usuario: "admin", clave: "admin123", rol: "admin", nombre: "Martin Palermo" },
-        { usuario: "usuario", clave: "usuario123", rol: "usuario",nombre: "Juan Riquelme" },
-        { usuario: "jefe", clave: "jefe123", rol: "jefe", area:"desarrollo", nombre: "Francesco Totti"},
-        { usuario: "Roger", clave: "Rasi12", rol: "usuario", nombre: "Roger Alexis Salgado" }
-      ];
+      if (!encontrado.activo) {
+        mensajeError.textContent = "Este usuario ha sido deshabilitado.";
+        mensajeError.classList.remove("d-none");
+        return;
+      }
 
-      const encontrado = credenciales.find(u => u.usuario === usuario && u.clave === clave);
+      // Guardar en localStorage
+      localStorage.setItem("rol", encontrado.rol);
+      localStorage.setItem("nombre", encontrado.nombre);
+      localStorage.setItem("usuario", encontrado.usuario);
+      if (encontrado.area) localStorage.setItem("area", encontrado.area);
 
-      if (encontrado) {
-        localStorage.setItem("rol", encontrado.rol);
-        localStorage.setItem("nombre", encontrado.nombre);
-
-        if (encontrado.rol === "admin") {
-          window.location.href = "dashboard_admin.html";
-        } else if (encontrado.rol === "jefe") {
-          window.location.href = "dashboard_jefe.html";
-        } else {
-          window.location.href = "dashboard.html";
-        }
-
+      // Redirección por rol
+      if (encontrado.rol === "admin") {
+        window.location.href = "dashboard_admin.html";
+      } else if (encontrado.rol === "jefe") {
+        window.location.href = "dashboard_jefe.html";
       } else {
-        alert("Usuario o contraseña incorrectos.");
+        window.location.href = "dashboard.html";
       }
     });
   </script>
