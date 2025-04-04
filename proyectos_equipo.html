@@ -18,20 +18,20 @@
   </header>
 
   <main class="container mt-5">
-    <h2 class="text-center text-danger mb-4">🗂️ Proyectos Asignados al Equipo</h2>
+    <h2 class="text-center text-danger mb-4">🗂️ Proyectos del Equipo</h2>
 
     <table class="table table-bordered bg-white shadow-sm">
       <thead class="table-danger">
         <tr>
           <th>Proyecto</th>
-          <th>Empleado Asignado</th>
-          <th>Horas Asignadas</th>
+          <th>Usuario</th>
+          <th>Descripción</th>
           <th>Horas Trabajadas</th>
           <th>Estado</th>
         </tr>
       </thead>
       <tbody id="tablaProyectos">
-        <!-- Datos simulados -->
+        <!-- Se llenará dinámicamente -->
       </tbody>
     </table>
   </main>
@@ -40,30 +40,28 @@
     const nombre = localStorage.getItem("nombre") || "Jefe Desarrollo";
     document.getElementById("nombre-usuario").textContent = nombre;
 
-    const proyectosSimulados = [
-      { proyecto: "Sistema de Inventario", empleado: "Roger Alexis", asignadas: 40, trabajadas: 28, estado: "En progreso" },
-      { proyecto: "Web para clientes", empleado: "Juan Riquelme", asignadas: 60, trabajadas: 60, estado: "Completado" },
-      { proyecto: "App Móvil Soporte", empleado: "Pedro Vargas", asignadas: 35, trabajadas: 20, estado: "En progreso" }
-    ];
-
     const tabla = document.getElementById("tablaProyectos");
+    const proyectos = JSON.parse(localStorage.getItem("proyectosGIAO")) || [];
 
-    proyectosSimulados.forEach(p => {
+    proyectos.forEach(p => {
       const fila = document.createElement("tr");
+
+      const estado = p.finalizado
+        ? '<span class="badge bg-success">Finalizado</span>'
+        : '<span class="badge bg-warning text-dark">En progreso</span>';
+
       fila.innerHTML = `
-        <td>${p.proyecto}</td>
-        <td>${p.empleado}</td>
-        <td>${p.asignadas}</td>
-        <td>${p.trabajadas}</td>
-        <td>
-          <span class="badge ${p.estado === 'Completado' ? 'bg-success' : 'bg-warning text-dark'}">${p.estado}</span>
-        </td>
+        <td>${p.nombre}</td>
+        <td>${p.usuario}</td>
+        <td>${p.descripcion}</td>
+        <td>${p.horas || 0}</td>
+        <td>${estado}</td>
       `;
       tabla.appendChild(fila);
     });
 
     function volver() {
-      window.location.href = "dashboard_jefe.html";
+      window.location.href = "dashboard.html";
     }
   </script>
 </body>

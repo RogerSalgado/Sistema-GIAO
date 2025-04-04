@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Proyectos - GIAO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2 class="text-center text-danger mb-4">📂 Gestión de Proyectos</h2>
+
+    <!-- Formulario nuevo proyecto -->
+    <form id="formProyecto" class="bg-white p-4 rounded shadow mb-5">
+      <h5 class="text-danger">Nuevo Proyecto</h5>
+      <div class="mb-3">
+        <label for="nombreProyecto" class="form-label">Nombre del Proyecto</label>
+        <input type="text" class="form-control" id="nombreProyecto" required>
+      </div>
+      <div class="mb-3">
+        <label for="descripcionProyecto" class="form-label">Descripción</label>
+        <textarea class="form-control" id="descripcionProyecto" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-danger w-100">Registrar Proyecto</button>
+    </form>
+
+    <!-- Tabla proyectos -->
+    <h4>📋 Proyectos Registrados</h4>
+    <table class="table table-bordered bg-white">
+      <thead class="table-danger">
+        <tr>
+          <th>Proyecto</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaProyectos"></tbody>
+    </table>
+
+    <div class="text-end">
+      <button class="btn btn-outline-secondary mt-3" onclick="volver()">Volver</button>
+    </div>
+  </div>
+
+  <!-- MODAL Documentar Proyecto -->
+  <div class="modal fade" id="modalDocu" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formDocu">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger" id="modalLabel">📑 Documentar Proyecto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="docuId">
+            <div class="mb-3">
+              <label class="form-label">Comentario / Avance</label>
+              <textarea class="form-control" id="comentario" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Horas trabajadas</label>
+              <input type="number" class="form-control" id="horas" min="1" required>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="finalizado">
+              <label class="form-check-label" for="finalizado">Marcar como Finalizado</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const usuario = localStorage.getItem("usuario") || "devuser";
+    let proyectos = JSON.parse(localStorage.getItem("proyectosGIAO")) || [];
+
+    function mostrarProyectos() {
+      const tabla = document.getElementById("tablaProyectos");
+      tabla.innerHTML = "";
+
+      const filtrados = proyectos.filter(p => p.usuario === usuario);
+      filtrados.forEach(p => {
+        const estado = p.finalizado ? `<span class="badge bg-success">Finalizado</span>` : `<span class="badge bg-warning text-dark">En progreso</span>`;
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${p.nombre}</td>
+          <td>${p.descripcion}</td>
+          <td>${estado}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-info" onclick="abrirModal(${p.id})">📑 Documentar</button>
+          </td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+
+    document.getElementById("formProyecto").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const nombre = document.getElementById("nombreProyecto").value;
+      const descripcion = document.getElementById("descripcionProyecto").value;
+
+      const nuevo = {
+        id: Date.now(),
+        usuario,
+        nombre,
+        descripcion,
+        comentarios: [],
+        horas: 0,
+        finalizado: false
+      };
+
+      proyectos.push(nuevo);
+      localStorage.setItem("proyectosGIAO", JSON.stringify(proyectos));
+      this.reset();
+      mostrarProyectos();
+    });
+
+    function abrirModal(id) {
+      const proyecto = proyectos.find(p => p.id === id);
+      if (!proyecto) return;
+
+      document.getElementById("docuId").value = id;
+      document.getElementById("comentario").value = "";
+      document.getElementById("horas").value = "";
+      document.getElementById("finalizado").checked = proyecto.finalizado;
+
+      const modal = new bootstrap.Modal(document.getElementById("modalDocu"));
+      modal.show();
+    }
+
+    document.getElementById("formDocu").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const id = parseInt(document.getElementById("docuId").value);
+      const comentario = document.getElementById("comentario").value;
+      const horas = parseInt(document.getElementById("horas").value);
+      const finalizado = document.getElementById("finalizado").checked;
+
+      const index = proyectos.findIndex(p => p.id === id);
+      if (index !== -1) {
+        proyectos[index].comentarios.push({ comentario, horas, fecha: new Date().toLocaleString() });
+        proyectos[index].horas += horas;
+        proyectos[index].finalizado = finalizado;
+
+        localStorage.setItem("proyectosGIAO", JSON.stringify(proyectos));
+        mostrarProyectos();
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalDocu"));
+        modal.hide();
+      }
+    });
+
+    function volver() {
+      window.location.href = "dashboard.html";
+    }
+
+    mostrarProyectos();
+  </script>
+</body>
+</html>

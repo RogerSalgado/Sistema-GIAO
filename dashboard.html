@@ -23,7 +23,7 @@
     </div>
 
     <div class="row justify-content-center text-center g-4" id="contenedor-opciones">
-      <!-- Botones se agregan dinámicamente -->
+      <!-- Botones según rol -->
     </div>
 
     <div class="text-center mt-5" id="vacaciones-container" style="display: none;">
@@ -34,64 +34,49 @@
   <script>
     const rol = localStorage.getItem("rol");
     const nombre = localStorage.getItem("nombre") || "Usuario";
+    const area = localStorage.getItem("area") || "";
+    const contenedor = document.getElementById("contenedor-opciones");
 
     document.getElementById("nombre-usuario").textContent = nombre;
     document.getElementById("bienvenida").textContent = `Bienvenido al sistema GIAO, ${nombre}`;
 
-    const contenedor = document.getElementById("contenedor-opciones");
-    const vacacionesContainer = document.getElementById("vacaciones-container");
-
-    const botones = {
-      usuario: [
-        { texto: "🕒<br>Asistencia", enlace: "asistencia.html" },
-        { texto: "📝<br>Permisos / Incapacidad", enlace: "permisos.html" },
-        { texto: "🌴<br>Vacaciones", enlace: "vacaciones.html" }
-      ],
-      userdev: [
-        { texto: "🕒<br>Asistencia", enlace: "asistencia.html" },
-        { texto: "📝<br>Permisos / Incapacidad", enlace: "permisos.html" },
-        { texto: "🌴<br>Vacaciones", enlace: "vacaciones.html" },
-        { texto: "💻<br>Mis Proyectos", enlace: "proyectos_usuario.html" }
-      ],
-      jefe: [
-        { texto: "📥<br>Solicitudes Pendientes", enlace: "solicitudes_pendientes.html" },
-        { texto: "👥<br>Asistencia del Equipo", enlace: "asistencia_equipo.html" },
-        { texto: "📊<br>Resumen del Equipo", enlace: "resumen_equipo.html" }
-        // El botón de proyectos se agrega dinámicamente si aplica
-      ],
-      admin: [
-        { texto: "👥<br>Gestión de Usuarios", enlace: "gestion_usuarios.html" },
-        { texto: "🔐<br>Roles y Permisos", enlace: "roles_permisos.html" },
-        { texto: "🧾<br>Mantenimientos", enlace: "mantenimientos.html" },
-        { texto: "📊<br>Reportes Generales", enlace: "reportes_generales.html" }
-      ]
-    };
-
-    // Agregar botones según rol
-    if (botones[rol]) {
-      botones[rol].forEach(btn => {
-        const div = document.createElement("div");
-        div.className = "col-md-3";
-        div.innerHTML = `
-          <a href="${btn.enlace}" class="btn btn-outline-danger w-100 py-4">${btn.texto}</a>
-        `;
-        contenedor.appendChild(div);
-      });
-    }
-
-    // Agregar botón de proyectos solo si jefe de desarrollo
-    if (rol === "jefe" && (nombre.toLowerCase().includes("desarrollo") || nombre.toLowerCase().includes("roger"))) {
+    function crearBoton(texto, enlace) {
       const div = document.createElement("div");
       div.className = "col-md-3";
       div.innerHTML = `
-        <a href="proyectos_equipo.html" class="btn btn-outline-danger w-100 py-4">🗂️<br>Proyectos en Curso</a>
+        <a href="${enlace}" class="btn btn-outline-danger w-100 py-4">${texto}</a>
       `;
       contenedor.appendChild(div);
     }
 
-    // Mostrar vacaciones solo a usuarios normales
-    if (rol === "usuario" || rol === "userdev") {
-      vacacionesContainer.style.display = "block";
+    if (rol === "admin") {
+      crearBoton("👥<br>Gestión de Usuarios", "gestion_usuarios.html");
+      crearBoton("🔐<br>Roles y Permisos", "roles_permisos.html");
+      crearBoton("🧾<br>Mantenimientos", "mantenimientos.html");
+      crearBoton("📊<br>Reportes Generales", "reportes_generales.html");
+    }
+
+    if (rol === "jefe") {
+      crearBoton("📥<br>Solicitudes Pendientes", "solicitudes_pendientes.html");
+      crearBoton("👥<br>Asistencia del Equipo", "asistencia_equipo.html");
+      crearBoton("📊<br>Resumen del Equipo", "resumen_equipo.html");
+
+      if (area.toLowerCase() === "desarrollo" || nombre.toLowerCase().includes("desarrollo")) {
+        crearBoton("🗂️<br>Proyectos en Curso", "proyectos_equipo.html");
+      }
+    }
+
+    if (rol === "usuario") {
+      crearBoton("🕒<br>Asistencia", "asistencia.html");
+      crearBoton("📝<br>Permisos / Incapacidad", "permisos.html");
+      crearBoton("🌴<br>Vacaciones", "vacaciones.html");
+
+      document.getElementById("vacaciones-container").style.display = "block";
+
+      // Si es usuario de desarrollo también
+      if (area.toLowerCase() === "desarrollo") {
+        crearBoton("💻<br>Mis Proyectos", "proyectos_usuario.html");
+      }
     }
 
     function cerrarSesion() {
