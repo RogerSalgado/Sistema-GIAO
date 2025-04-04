@@ -65,11 +65,10 @@
     const usuarios = [
       { usuario: "admin", clave: "admin123", rol: "admin", nombre: "Martin Palermo", activo: true },
       { usuario: "usuario", clave: "usuario123", rol: "usuario", nombre: "Juan Riquelme", activo: true },
-      { usuario: "jefe", clave: "jefe123", rol: "jefe", nombre: "Francesco Totti", area: "desarrollo", activo: true },
+      { usuario: "jefe", clave: "jefe123", rol: "jefe", nombre: "Francesco Totti", area: "general", activo: true },
       { usuario: "Roger", clave: "Rasi12", rol: "usuario", nombre: "Roger Alexis Salgado", activo: true },
-      { usuario: "inactivo", clave: "1234", rol: "usuario", nombre: "Usuario Deshabilitado", activo: false },
-      { usuario: "devjefe", clave: "dev123", rol: "jefe", nombre: "Desarrollo Jefe", area: "desarrollo", activo: true }
-      
+      { usuario: "devjefe", clave: "dev123", rol: "jefe", nombre: "Desarrollo Jefe", area: "desarrollo", activo: true },
+      { usuario: "inactivo", clave: "1234", rol: "usuario", nombre: "Usuario Deshabilitado", activo: false }
     ];
 
     document.getElementById("loginForm").addEventListener("submit", function (e) {
@@ -93,20 +92,18 @@
         return;
       }
 
-      // Guardar en localStorage
+      // Guardar datos en localStorage
       localStorage.setItem("rol", encontrado.rol);
       localStorage.setItem("nombre", encontrado.nombre);
       localStorage.setItem("usuario", encontrado.usuario);
-      if (encontrado.area) localStorage.setItem("area", encontrado.area);
-
-      // Redirección por rol
-      if (encontrado.rol === "admin") {
-        window.location.href = "dashboard_admin.html";
-      } else if (encontrado.rol === "jefe") {
-        window.location.href = "dashboard_jefe.html";
+      if (encontrado.area) {
+        localStorage.setItem("area", encontrado.area);
       } else {
-        window.location.href = "dashboard.html";
+        localStorage.removeItem("area");
       }
+
+      // Redirigir al dashboard único
+      window.location.href = "dashboard.html";
     });
   </script>
 </body>
