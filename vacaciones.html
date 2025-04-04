@@ -7,6 +7,23 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger px-4">
+    <a class="navbar-brand fw-bold text-white" href="#">Sistema GIAO</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGIAO">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarGIAO">
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item">
+          <button class="btn btn-light btn-sm" onclick="volver()">Volver</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Contenido -->
   <div class="container mt-5">
     <h2 class="text-center text-danger mb-4">🌴 Solicitud de Vacaciones</h2>
 
@@ -35,24 +52,23 @@
     </form>
 
     <h4 class="mt-5">📄 Solicitudes Realizadas</h4>
-    <table class="table table-bordered mt-3">
-      <thead class="table-danger">
-        <tr>
-          <th>Inicio</th>
-          <th>Fin</th>
-          <th>Comentario</th>
-          <th>Estado</th>
-          <th>Respuesta del Jefe</th>
-        </tr>
-      </thead>
-      <tbody id="tablaVacaciones"></tbody>
-    </table>
-
-    <div class="text-end">
-      <button class="btn btn-outline-secondary mt-3" onclick="volver()">Volver</button>
+    <div class="table-responsive">
+      <table class="table table-bordered mt-3">
+        <thead class="table-danger">
+          <tr>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Comentario</th>
+            <th>Estado</th>
+            <th>Respuesta del Jefe</th>
+          </tr>
+        </thead>
+        <tbody id="tablaVacaciones"></tbody>
+      </table>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script>
     const nombre = localStorage.getItem("nombre") || "Empleado";
     let solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
@@ -68,7 +84,7 @@
             <td>${s.inicio}</td>
             <td>${s.fin}</td>
             <td>${s.comentario}</td>
-            <td>${s.estado}</td>
+            <td><span class="badge ${s.estado === "Pendiente" ? "bg-warning text-dark" : s.estado === "Aprobado" ? "bg-success" : "bg-danger"}">${s.estado}</span></td>
             <td>${s.respuesta || ""}</td>
           `;
           tabla.appendChild(fila);
@@ -110,5 +126,6 @@
 
     mostrarSolicitudes();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

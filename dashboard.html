@@ -8,15 +8,27 @@
 </head>
 <body class="bg-light">
 
-  <header class="navbar navbar-expand-lg navbar-dark bg-danger px-4">
-    <a class="navbar-brand fw-bold text-white" href="#">Sistema GIAO</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
-      <span class="navbar-text me-3 text-white" id="nombre-usuario">Usuario</span>
-      <button class="btn btn-light btn-sm" onclick="cerrarSesion()">Cerrar sesión</button>
+  <!-- ✅ Navbar responsiva -->
+  <header class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">Sistema GIAO</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuHeader" aria-controls="menuHeader" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-between" id="menuHeader">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- Aquí puedes agregar más links si deseas -->
+        </ul>
+        <div class="d-flex align-items-center">
+          <span class="text-white me-3" id="nombre-usuario">Usuario</span>
+          <button class="btn btn-light btn-sm" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+      </div>
     </div>
   </header>
 
+  <!-- Contenido principal -->
   <main class="container mt-5">
     <div class="text-center mb-4">
       <h2 id="bienvenida" class="text-danger fw-bold"></h2>
@@ -46,8 +58,12 @@
     </div>
   </main>
 
+  <!-- JS Bootstrap y lógica -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    const rol = localStorage.getItem("rol");
     const nombre = localStorage.getItem("nombre") || "Usuario";
+
     document.getElementById("nombre-usuario").textContent = nombre;
     document.getElementById("bienvenida").textContent = `Bienvenido al sistema GIAO, ${nombre}`;
 

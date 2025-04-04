@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resumen del Equipo - GIAO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2 class="text-center text-danger mb-4">📊 Resumen del Equipo</h2>
+
+    <table class="table table-bordered bg-white shadow-sm">
+      <thead class="table-danger">
+        <tr>
+          <th>Empleado</th>
+          <th>Días Asistidos</th>
+          <th>Permisos</th>
+          <th>Incapacidades</th>
+          <th>Vacaciones</th>
+          <th>Días Restantes Vacaciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaResumen">
+        <!-- Se llenará dinámicamente -->
+      </tbody>
+    </table>
+
+    <div class="text-end">
+      <button class="btn btn-outline-secondary mt-3" onclick="volver()">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    // Simulación de datos
+    const resumen = [
+      {
+        empleado: "Roger Alexis Salgado",
+        asistencias: 18,
+        permisos: 2,
+        incapacidades: 0,
+        vacaciones: 1,
+        diasRestantes: 9
+      },
+      {
+        empleado: "Juan Riquelme",
+        asistencias: 20,
+        permisos: 0,
+        incapacidades: 1,
+        vacaciones: 2,
+        diasRestantes: 8
+      },
+      {
+        empleado: "María López",
+        asistencias: 19,
+        permisos: 1,
+        incapacidades: 0,
+        vacaciones: 0,
+        diasRestantes: 10
+      }
+    ];
+
+    function mostrarResumen() {
+      const tabla = document.getElementById("tablaResumen");
+      resumen.forEach(r => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${r.empleado}</td>
+          <td>${r.asistencias}</td>
+          <td>${r.permisos}</td>
+          <td>${r.incapacidades}</td>
+          <td>${r.vacaciones}</td>
+          <td>${r.diasRestantes}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+
+    function volver() {
+      window.location.href = "dashboard_jefe.html";
+    }
+
+    mostrarResumen();
+  </script>
+</body>
+</html>

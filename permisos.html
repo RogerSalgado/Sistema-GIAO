@@ -7,6 +7,23 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger px-4">
+    <a class="navbar-brand fw-bold text-white" href="#">Sistema GIAO</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPermiso">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarPermiso">
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item">
+          <button class="btn btn-light btn-sm" onclick="volver()">Volver</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Contenido -->
   <div class="container mt-5">
     <h2 class="text-center text-danger mb-4">Solicitud de Permisos / Incapacidades</h2>
 
@@ -50,35 +67,38 @@
     </form>
 
     <h4 class="mt-5">📄 Solicitudes Realizadas</h4>
-    <table class="table table-bordered mt-3">
-      <thead class="table-danger">
-        <tr>
-          <th>Tipo</th>
-          <th>Inicio</th>
-          <th>Fin</th>
-          <th>Comentario</th>
-          <th>Horas</th>
-          <th>Estado</th>
-          <th>Respuesta</th>
-        </tr>
-      </thead>
-      <tbody id="tablaPermisos"></tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-bordered mt-3">
+        <thead class="table-danger">
+          <tr>
+            <th>Tipo</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Comentario</th>
+            <th>Horas</th>
+            <th>Estado</th>
+            <th>Respuesta</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPermisos"></tbody>
+      </table>
+    </div>
 
     <div class="text-end">
       <button class="btn btn-outline-secondary mt-3" onclick="volver()">Volver</button>
     </div>
   </div>
 
+  <!-- Script -->
   <script>
+    const nombre = localStorage.getItem("nombre") || "Usuario";
+    let solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
+
     function mostrarCampos() {
       const tipo = document.getElementById("tipo").value;
       document.getElementById("horasDiv").style.display = tipo === "Permiso" ? "block" : "none";
       document.getElementById("adjuntoDiv").style.display = tipo === "Incapacidad" ? "block" : "none";
     }
-
-    const nombre = localStorage.getItem("nombre") || "Usuario";
-    let solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
 
     function mostrarSolicitudes() {
       const tabla = document.getElementById("tablaPermisos");
@@ -111,12 +131,12 @@
       const horas = document.getElementById("horas").value || "-";
 
       if (new Date(inicio) > new Date(fin)) {
-        alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        alert("La fecha de inicio no puede ser posterior a la de fin.");
         return;
       }
 
-      if (tipo === "Permiso" && horas !== "-" && parseInt(horas) > 4) {
-        alert("Los permisos mayores a 4 horas deben ser solicitados como vacaciones.");
+      if (tipo === "Permiso" && parseInt(horas) > 4) {
+        alert("Los permisos mayores a 4 horas deben solicitarse como vacaciones.");
         return;
       }
 
@@ -127,7 +147,7 @@
         inicio,
         fin,
         comentario,
-        horas,
+        horas: tipo === "Permiso" ? horas : "-",
         estado: "Pendiente",
         respuesta: ""
       };
@@ -145,5 +165,6 @@
 
     mostrarSolicitudes();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
