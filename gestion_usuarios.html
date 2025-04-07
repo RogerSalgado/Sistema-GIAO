@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Usuarios - GIAO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2 class="text-danger text-center mb-4">👥 Gestión de Usuarios</h2>
+
+    <!-- Formulario para agregar usuario -->
+    <form id="formUsuario" class="bg-white p-4 rounded shadow mb-4">
+      <h5 class="mb-3 text-danger">Agregar Nuevo Usuario</h5>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Usuario</label>
+          <input type="text" class="form-control" id="nuevoUsuario" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Nombre Completo</label>
+          <input type="text" class="form-control" id="nuevoNombre" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="nuevaClave" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Rol</label>
+          <select class="form-select" id="nuevoRol" required>
+            <option value="">Seleccione un rol</option>
+            <option value="usuario">Usuario</option>
+            <option value="jefe">Jefe</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Área (opcional)</label>
+          <input type="text" class="form-control" id="nuevaArea">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-danger w-100">Agregar Usuario</button>
+    </form>
+
+    <!-- Tabla de usuarios -->
+    <h5 class="text-danger mb-3">Usuarios Registrados</h5>
+    <table class="table table-bordered table-hover bg-white shadow-sm">
+      <thead class="table-danger">
+        <tr>
+          <th>Usuario</th>
+          <th>Nombre</th>
+          <th>Rol</th>
+          <th>Área</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaUsuarios"></tbody>
+    </table>
+
+    <div class="text-end mt-3">
+      <button class="btn btn-outline-secondary" onclick="volver()">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    const tabla = document.getElementById("tablaUsuarios");
+    let usuarios = JSON.parse(localStorage.getItem("usuariosGIAO")) || [];
+
+    function renderizarUsuarios() {
+      tabla.innerHTML = "";
+      usuarios.forEach((u, i) => {
+        tabla.innerHTML += `
+          <tr>
+            <td>${u.usuario}</td>
+            <td>${u.nombre}</td>
+            <td>${u.rol}</td>
+            <td>${u.area || "-"}</td>
+            <td>
+              <span class="badge ${u.activo ? "bg-success" : "bg-secondary"}">
+                ${u.activo ? "Activo" : "Inactivo"}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-warning me-2" onclick="toggleEstado(${i})">
+                ${u.activo ? "Deshabilitar" : "Habilitar"}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function toggleEstado(index) {
+      usuarios[index].activo = !usuarios[index].activo;
+      localStorage.setItem("usuariosGIAO", JSON.stringify(usuarios));
+      renderizarUsuarios();
+    }
+
+    document.getElementById("formUsuario").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const usuario = document.getElementById("nuevoUsuario").value.trim();
+      const nombre = document.getElementById("nuevoNombre").value.trim();
+      const clave = document.getElementById("nuevaClave").value.trim();
+      const rol = document.getElementById("nuevoRol").value;
+      const area = document.getElementById("nuevaArea").value.trim();
+
+      if (!usuario || !nombre || !clave || !rol) {
+        alert("Por favor complete todos los campos obligatorios.");
+        return;
+      }
+
+      const existente = usuarios.find(u => u.usuario === usuario);
+      if (existente) {
+        alert("Este nombre de usuario ya existe.");
+        return;
+      }
+
+      usuarios.push({ usuario, nombre, clave, rol, area, activo: true });
+      localStorage.setItem("usuariosGIAO", JSON.stringify(usuarios));
+      this.reset();
+      renderizarUsuarios();
+    });
+
+    function volver() {
+      window.location.href = "dashboard.html";
+    }
+
+    renderizarUsuarios();
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roles y Permisos - GIAO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2 class="text-danger text-center mb-4">🔐 Gestión de Roles y Permisos</h2>
+
+    <!-- Tabla de Roles -->
+    <table class="table table-bordered bg-white shadow-sm">
+      <thead class="table-danger">
+        <tr>
+          <th>Rol</th>
+          <th>Permisos</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaRoles"></tbody>
+    </table>
+
+    <div class="text-end mt-3">
+      <button class="btn btn-outline-secondary" onclick="volver()">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    let roles = JSON.parse(localStorage.getItem("rolesGIAO")) || [
+      { nombre: "admin", permisos: ["Gestionar usuarios", "Ver reportes", "Realizar mantenimientos"] },
+      { nombre: "jefe", permisos: ["Aprobar solicitudes", "Ver equipo", "Consultar reportes"] },
+      { nombre: "usuario", permisos: ["Solicitar vacaciones", "Marcar asistencia", "Ver proyectos"] }
+    ];
+
+    function renderizarRoles() {
+      const tabla = document.getElementById("tablaRoles");
+      tabla.innerHTML = "";
+
+      roles.forEach((rol, index) => {
+        tabla.innerHTML += `
+          <tr>
+            <td class="fw-bold">${rol.nombre}</td>
+            <td>
+              <ul>
+                ${rol.permisos.map(p => `<li>${p}</li>`).join("")}
+              </ul>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-warning" onclick="editar(${index})">Editar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function editar(index) {
+      const permisosNuevos = prompt("Ingrese los permisos separados por coma:", roles[index].permisos.join(", "));
+      if (permisosNuevos !== null) {
+        roles[index].permisos = permisosNuevos.split(",").map(p => p.trim()).filter(p => p !== "");
+        localStorage.setItem("rolesGIAO", JSON.stringify(roles));
+        renderizarRoles();
+      }
+    }
+
+    function volver() {
+      window.location.href = "dashboard.html";
+    }
+
+    renderizarRoles();
+  </script>
+</body>
+</html>

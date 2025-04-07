@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reportes Generales - GIAO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <header class="navbar navbar-expand-lg navbar-dark bg-danger px-4">
+    <a class="navbar-brand fw-bold text-white" href="#">Sistema GIAO</a>
+    <div class="collapse navbar-collapse"></div>
+    <span class="navbar-text me-3 text-white" id="nombre-usuario">Administrador</span>
+    <button class="btn btn-light btn-sm" onclick="volver()">Volver</button>
+  </header>
+
+  <main class="container mt-5">
+    <h2 class="text-center text-danger mb-4">📊 Reportes Generales del Sistema</h2>
+
+    <!-- Filtros -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <label class="form-label">Tipo de Solicitud</label>
+        <select class="form-select" id="filtroTipo">
+          <option value="">Todas</option>
+          <option value="Vacaciones">Vacaciones</option>
+          <option value="Permiso">Permiso</option>
+          <option value="Incapacidad">Incapacidad</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Estado</label>
+        <select class="form-select" id="filtroEstado">
+          <option value="">Todos</option>
+          <option value="Aprobado">Aprobado</option>
+          <option value="Rechazado">Rechazado</option>
+          <option value="Pendiente">Pendiente</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Desde</label>
+        <input type="date" class="form-control" id="filtroDesde">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Hasta</label>
+        <input type="date" class="form-control" id="filtroHasta">
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-3 mb-4">
+      <button class="btn btn-outline-primary" onclick="exportarCSV()">📥 Exportar CSV</button>
+      <button class="btn btn-outline-secondary" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+
+    <!-- Reportes -->
+    <div class="row text-center mb-4">
+      <div class="col-md-4">
+        <div class="border border-danger p-4 rounded">
+          <h5 class="text-danger">Solicitudes Filtradas</h5>
+          <h3 id="totalSolicitudes">0</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="border border-success p-4 rounded">
+          <h5 class="text-success">Aprobadas</h5>
+          <h3 id="aprobadas">0</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="border border-warning p-4 rounded">
+          <h5 class="text-warning">Rechazadas</h5>
+          <h3 id="rechazadas">0</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col-md-6">
+        <div class="border border-primary p-4 rounded">
+          <h5 class="text-primary">Empleados Activos</h5>
+          <h3 id="activos">0</h3>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="border border-info p-4 rounded">
+          <h5 class="text-info">Registros de Asistencia</h5>
+          <h3 id="asistencia">0</h3>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const nombre = localStorage.getItem("nombre") || "Administrador";
+    document.getElementById("nombre-usuario").textContent = nombre;
+
+    const solicitudes = JSON.parse(localStorage.getItem("solicitudesGIAO")) || [];
+    const empleados = [
+      { usuario: "admin", activo: true },
+      { usuario: "usuario", activo: true },
+      { usuario: "devuser", activo: true },
+      { usuario: "jefe", activo: true },
+      { usuario: "Roger", activo: true },
+      { usuario: "devjefe", activo: true },
+      { usuario: "inactivo", activo: false }
+    ];
+    const asistencia = JSON.parse(localStorage.getItem("asistenciaGIAO")) || [];
+
+    document.getElementById("activos").textContent = empleados.filter(e => e.activo).length;
+    document.getElementById("asistencia").textContent = asistencia.length;
+
+    const totalSolicitudes = document.getElementById("totalSolicitudes");
+    const aprobadasEl = document.getElementById("aprobadas");
+    const rechazadasEl = document.getElementById("rechazadas");
+
+    function aplicarFiltros() {
+      const tipo = document.getElementById("filtroTipo").value;
+      const estado = document.getElementById("filtroEstado").value;
+      const desde = document.getElementById("filtroDesde").value;
+      const hasta = document.getElementById("filtroHasta").value;
+
+      const filtradas = solicitudes.filter(s => {
+        const fecha = new Date(s.inicio);
+        const matchTipo = !tipo || s.tipo === tipo;
+        const matchEstado = !estado || s.estado === estado;
+        const matchDesde = !desde || fecha >= new Date(desde);
+        const matchHasta = !hasta || fecha <= new Date(hasta);
+        return matchTipo && matchEstado && matchDesde && matchHasta;
+      });
+
+      totalSolicitudes.textContent = filtradas.length;
+      aprobadasEl.textContent = filtradas.filter(f => f.estado === "Aprobado").length;
+      rechazadasEl.textContent = filtradas.filter(f => f.estado === "Rechazado").length;
+
+      return filtradas;
+    }
+
+    document.getElementById("filtroTipo").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroEstado").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroDesde").addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroHasta").addEventListener("change", aplicarFiltros);
+
+    function exportarCSV() {
+      const data = aplicarFiltros();
+      if (data.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      let csv = "Empleado,Tipo,Inicio,Fin,Comentario,Estado,Respuesta\n";
+      data.forEach(d => {
+        csv += `"${d.empleado}","${d.tipo}","${d.inicio}","${d.fin}","${d.comentario}","${d.estado}","${d.respuesta || ""}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "solicitudes_filtradas.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function volver() {
+      window.location.href = "dashboard.html";
+    }
+
+    aplicarFiltros(); // inicializa datos
+  </script>
+</body>
+</html>
