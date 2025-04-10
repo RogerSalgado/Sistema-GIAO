@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Perfil - GIAO</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2 class="text-danger text-center mb-4">👤 Mi Perfil</h2>
+
+    <div class="card shadow p-4 mb-4">
+      <div class="row">
+        <div class="col-md-3 text-center">
+          <img src="https://via.placeholder.com/120" class="rounded-circle mb-3" alt="Foto de Perfil">
+        </div>
+        <div class="col-md-9">
+          <h4 id="nombre-usuario">Nombre del Usuario</h4>
+          <p><strong>Usuario:</strong> <span id="username"></span></p>
+          <p><strong>Área:</strong> <span id="area"></span></p>
+          <p><strong>Rol:</strong> <span id="rol"></span></p>
+          <button class="btn btn-outline-danger mt-3" data-bs-toggle="modal" data-bs-target="#modalCambioClave">🔑 Cambiar Contraseña</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-end">
+      <button class="btn btn-secondary" onclick="volver()">Volver</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalCambioClave" tabindex="-1" aria-labelledby="modalCambioClaveLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formCambioClave">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="modalCambioClaveLabel">Cambiar Contraseña</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="nuevaClave" class="form-label">Nueva Contraseña</label>
+              <input type="password" class="form-control" id="nuevaClave" required>
+              <div class="form-text">
+                La contraseña debe contener al menos una mayúscula, un número no consecutivo, y un carácter especial.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="confirmarClave" class="form-label">Confirmar Contraseña</label>
+              <input type="password" class="form-control" id="confirmarClave" required>
+            </div>
+            <div id="mensajeValidacion" class="text-danger small"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Guardar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Cargar datos del usuario
+    const nombre = localStorage.getItem("nombre") || "Usuario";
+    const usuario = localStorage.getItem("usuario") || "sin_usuario";
+    const area = localStorage.getItem("area") || "N/A";
+    const rol = localStorage.getItem("rol") || "usuario";
+
+    document.getElementById("nombre-usuario").textContent = nombre;
+    document.getElementById("username").textContent = usuario;
+    document.getElementById("area").textContent = area;
+    document.getElementById("rol").textContent = rol;
+
+    // Validación contraseña
+    document.getElementById("formCambioClave").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const nueva = document.getElementById("nuevaClave").value;
+      const confirmar = document.getElementById("confirmarClave").value;
+      const mensaje = document.getElementById("mensajeValidacion");
+
+      const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}[\]|\\:;"'<>,.?/])[^\s]{6,}$/;
+
+      if (nueva !== confirmar) {
+        mensaje.textContent = "Las contraseñas no coinciden.";
+        return;
+      }
+
+      if (!regex.test(nueva)) {
+        mensaje.textContent = "La contraseña no cumple con los requisitos.";
+        return;
+      }
+
+      mensaje.textContent = "";
+      alert("✅ Contraseña actualizada exitosamente (simulado)");
+      document.getElementById("formCambioClave").reset();
+      const modal = bootstrap.Modal.getInstance(document.getElementById("modalCambioClave"));
+      modal.hide();
+    });
+
+    function volver() {
+      window.location.href = "dashboard_usuarios.html";
+    }
+  </script>
+</body>
+</html>
